@@ -1,6 +1,6 @@
 import numpy as np
 import torch
-
+import time
 from .deep.feature_extractor import Extractor
 from .sort.nn_matching import NearestNeighborDistanceMetric
 from .sort.preprocessing import non_max_suppression
@@ -31,20 +31,48 @@ class DeepSort(object):
         self.height, self.width = ori_img.shape[:2]
         # generate detections
         # 从原图中抠取bbox对应图片并计算得到相应的特征
-        features = self._get_features(bbox_xywh, ori_img)
-        bbox_tlwh = self._xywh_to_tlwh(bbox_xywh)        
+        # features = self._get_features(bbox_xywh, ori_img)
+        start_time = time.time()  # Start the timer
+        features = self._get_features(bbox_xywh, ori_img)  # Get features
+        feature_time = time.time() - start_time  # Ca
+        bbox_tlwh = self._xywh_to_tlwh(bbox_xywh)   
+        print(f"Time taken for _get_features: {feature_time:.5f} seconds")     
         # 筛选掉小于min_confidence的目标，并构造一个Detection对象构成的列表
         detections = [Detection(bbox_tlwh[i], conf, features[i]) for i,conf in enumerate(confidences) if conf>self.min_confidence]
 
-        # run on non-maximum supression
-        boxes = np.array([d.tlwh for d in detections])
-        scores = np.array([d.confidence for d in detections])
-        indices = non_max_suppression(boxes, self.nms_max_overlap, scores)
-        detections = [detections[i] for i in indices]
+        # # run on non-maximum supression
+        # boxes = np.array([d.tlwh for d in detections])
+        # scores = np.array([d.confidence for d in detections])
+        # indices = non_max_suppression(boxes, self.nms_max_overlap, scores)
+        # detections = [detections[i] for i in indices]
 
         # update tracker
+        # cal the time of following function
+
         self.tracker.predict() # 将跟踪状态分布向前传播一步
         self.tracker.update(detections) # 执行测量更新和跟踪管理
+       
+# Existing code...
+
+# Measure time for self.tracker.predict
+        # start_time = time.time()  # Start the timer for tracker.predict
+        # self.tracker.predict()  # 将跟踪状态分布向前传播一步
+        # predict_time = time.time() - start_time  # Calculate the elapsed time for tracker.predict
+
+        # # Measure time for self.tracker.update
+        # start_time = time.time()  # Start the timer for tracker.update
+        # self.tracker.update(detections)  # 执行测量更新和跟踪管理
+        # update_time = time.time() - start_time  # Calculate the elapsed time for tracker.update
+
+        # # Optionally, print out the time taken for each function call
+        # print(f"Time taken for tracker.predict: {predict_time:.5f} seconds")
+        # print(f"Time taken for tracker.update: {update_time:.5f} seconds")
+
+# Continue with the rest of the processing...
+ 
+
+        
+        
 
         # output bbox identities
         outputs = []

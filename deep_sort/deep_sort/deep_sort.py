@@ -32,11 +32,11 @@ class DeepSort(object):
         # generate detections
         # 从原图中抠取bbox对应图片并计算得到相应的特征
         # features = self._get_features(bbox_xywh, ori_img)
-        start_time = time.time()  # Start the timer
+         # Start the timer
         features = self._get_features(bbox_xywh, ori_img)  # Get features
-        feature_time = time.time() - start_time  # Ca
+        # Ca
         bbox_tlwh = self._xywh_to_tlwh(bbox_xywh)   
-        print(f"Time taken for _get_features: {feature_time:.5f} seconds")     
+           
         # 筛选掉小于min_confidence的目标，并构造一个Detection对象构成的列表
         detections = [Detection(bbox_tlwh[i], conf, features[i]) for i,conf in enumerate(confidences) if conf>self.min_confidence]
 
@@ -48,7 +48,7 @@ class DeepSort(object):
 
         # update tracker
         # cal the time of following function
-
+        
         self.tracker.predict() # 将跟踪状态分布向前传播一步
         self.tracker.update(detections) # 执行测量更新和跟踪管理
        

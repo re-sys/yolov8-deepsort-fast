@@ -49,24 +49,24 @@ class DeepSort(object):
         # update tracker
         # cal the time of following function
 
-        # self.tracker.predict() # 将跟踪状态分布向前传播一步
-        # self.tracker.update(detections) # 执行测量更新和跟踪管理
+        self.tracker.predict() # 将跟踪状态分布向前传播一步
+        self.tracker.update(detections) # 执行测量更新和跟踪管理
        
 # Existing code...
 
-# Measure time for self.tracker.predict
-        start_time = time.time()  # Start the timer for tracker.predict
-        self.tracker.predict()  # 将跟踪状态分布向前传播一步
-        predict_time = time.time() - start_time  # Calculate the elapsed time for tracker.predict
+# # Measure time for self.tracker.predict
+#         start_time = time.time()  # Start the timer for tracker.predict
+#         self.tracker.predict()  # 将跟踪状态分布向前传播一步
+#         predict_time = time.time() - start_time  # Calculate the elapsed time for tracker.predict
 
-        # Measure time for self.tracker.update
-        start_time = time.time()  # Start the timer for tracker.update
-        self.tracker.update(detections)  # 执行测量更新和跟踪管理
-        update_time = time.time() - start_time  # Calculate the elapsed time for tracker.update
+#         # Measure time for self.tracker.update
+#         start_time = time.time()  # Start the timer for tracker.update
+#         self.tracker.update(detections)  # 执行测量更新和跟踪管理
+#         update_time = time.time() - start_time  # Calculate the elapsed time for tracker.update
 
-        # Optionally, print out the time taken for each function call
-        print(f"Time taken for tracker.predict: {predict_time:.5f} seconds")
-        print(f"Time taken for tracker.update: {update_time:.5f} seconds")
+#         # Optionally, print out the time taken for each function call
+#         print(f"Time taken for tracker.predict: {predict_time:.5f} seconds")
+#         print(f"Time taken for tracker.update: {update_time:.5f} seconds")
 
 # Continue with the rest of the processing...
  

@@ -90,9 +90,9 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
     # 对每一帧图片进行读取和处理
 
  
-    # fps = 0  # Initialize a variable for frames per second
-    # frame_count = 0  # Count the number of frames processed
-    # start_time = time.time()  # Start time
+    fps = 0  # Initialize a variable for frames per second
+    frame_count = 0  # Count the number of frames processed
+    start_time = time.time()  # Start time
     
     while True:
         success, frame = cap.read()  # Read video frame by frame.
@@ -146,22 +146,19 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
             x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])  # Convert position to integers.
             cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 255), 3)
             cv2.putText(frame, str(int(Id)), (max(-10, x1), max(40, y1)), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
-            #计算x1y1 x2y2的矩形框面积，在图像中显示
-            # area = (x2-x1)*(y2-y1)
-            # cv2.putText(frame, str(int(area)), (max(-10, x1), max(60, y1)), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
             
         # # Update frame count
-        # frame_count += 1
+        frame_count += 1
     
-        # # Calculate FPS every second
-        # current_time = time.time()
-        # if current_time - start_time >= 1.0:  # Update if a second has passed
-        #     fps = frame_count
-        #     frame_count = 0  # Reset frame count
-        #     start_time = current_time  # Reset start time
+        # Calculate FPS every second
+        current_time = time.time()
+        if current_time - start_time >= 1.0:  # Update if a second has passed
+            fps = frame_count
+            frame_count = 0  # Reset frame count
+            start_time = current_time  # Reset start time
     
         # # Display the FPS on the frame
-        # cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
+        cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
         # # print consuming time
         
         cv2.imshow("frame", frame)  # Show the current frame.
@@ -176,50 +173,8 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
     
     return -1
 
-def first():
-    from pathlib import Path
 
-    # Fetch `notebook_utils` module
-    import requests
-
-    r = requests.get(
-        url="https://raw.githubusercontent.com/openvinotoolkit/openvino_notebooks/latest/utils/notebook_utils.py",
-    )
-
-    open("notebook_utils.py", "w").write(r.text)
-
-    from notebook_utils import download_file, VideoPlayer, device_widget, quantization_widget
-    DET_MODEL_NAME = "yolov8n"
-
-    det_model = YOLO(f"{DET_MODEL_NAME}.pt")
-    det_model.to("cpu")
-    import torch
-    import openvino as ov
-
-    core = ov.Core()
-    det_model_path = "/home/wu/my_ws/src/yolo_pub/yolo_pub/yolov8n_openvino_model/yolov8n.xml"
-    det_ov_model = core.read_model(det_model_path)
-
-    ov_config = {}
-    # if device.value != "CPU":
-    #     det_ov_model.reshape({0: [1, 3, 640, 640]})
-    # if "GPU" in device.value or ("AUTO" in device.value and "GPU" in core.available_devices):
-    #     ov_config = {"GPU_DISABLE_WINOGRAD_CONVOLUTION": "YES"}
-    det_ov_model.reshape({0: [1, 3, 640, 640]})
-    det_compiled_model = core.compile_model(det_ov_model, "CPU", ov_config)
-
-
-    def infer(*args):
-        result = det_compiled_model(args)
-        return torch.from_numpy(result[0])
-
-
-    det_model.predictor.inference = infer
-    det_model.predictor.model.pt = False
-    det_model
-
-    # res = det_model(IMAGE_PATH)
-    # Image.fromarray(res[0].plot()[:, :, ::-1])
+   
 
 
 

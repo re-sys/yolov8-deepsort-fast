@@ -40,7 +40,7 @@ class DeepSort(object):
         # 筛选掉小于min_confidence的目标，并构造一个Detection对象构成的列表
         detections = [Detection(bbox_tlwh[i], conf, features[i]) for i,conf in enumerate(confidences) if conf>self.min_confidence]
 
-        # # run on non-maximum supression
+        # run on non-maximum supression
         # boxes = np.array([d.tlwh for d in detections])
         # scores = np.array([d.confidence for d in detections])
         # indices = non_max_suppression(boxes, self.nms_max_overlap, scores)

@@ -74,8 +74,8 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
         print(f"Error opening video file {input_path}")
         return None
     
-    # fps = cap.get(cv2.CAP_PROP_FPS)  # 获取视频的帧率
-    # size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))) # 获取视频的分辨率（宽度和高度）。
+    fps = cap.get(cv2.CAP_PROP_FPS)  # 获取视频的帧率
+    size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))) # 获取视频的分辨率（宽度和高度）。
     # print(f"Input video size: {size}, FPS: {fps}")
     # output_video_path = Path(output_path) / "output.avi" # 设置输出视频的保存路径。
 
@@ -85,12 +85,13 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
     # # 下载完成后将dll文件放在当前文件夹内
     # fourcc = cv2.VideoWriter_fourcc(*"XVID")
     # output_video = cv2.VideoWriter(output_video_path.as_posix(), fourcc, fps, size, isColor=True) # 创建一个VideoWriter对象用于写视频。
-
+    fourcc = cv2.VideoWriter_fourcc(*"XVID")
+    output_video = cv2.VideoWriter(output_path, fourcc, fps, size) 
     # 对每一帧图片进行读取和处理
 
  
-    fps = 0  # Initialize a variable for frames per second
-    frame_count = 0  # Count the number of frames processed
+    # fps = 0  # Initialize a variable for frames per second
+    # frame_count = 0  # Count the number of frames processed
     # start_time = time.time()  # Start time
     
     while True:
@@ -98,28 +99,29 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
         if not success:
             break
         # Resize the frame to the same size as the training data，0.5的缩放比例
-        frame = cv2.resize(frame, (640, 640))
+        # frame = cv2.resize(frame, (640, 640))
         # Process the frame with YOLO and DeepSORT
         # results = model.track(frame, persist=True, classes=[0])
         # detections, confarray = extract_detections(results, detect_class)
         # resultsTracker = tracker.update(detections, confarray, frame)
     # Make sure to import the time module
         # import time
-        start_time = time.time()
+        # start_time = time.time()
 
     # Process the frame with YOLO and DeepSORT
         results = model.predict(frame)
+        # frame = results[0].plot()
         detections, confarray = extract_detections(results, detect_class)
         resultsTracker = tracker.update(detections, confarray, frame)
 
-        # End time for measuring the overall execution time
-        end_time = time.time()
+        # # End time for measuring the overall execution time
+        # end_time = time.time()
 
-        # Calculate the elapsed time
-        elapsed_time = end_time - start_time
+        # # Calculate the elapsed time
+        # elapsed_time = end_time - start_time
 
-        # Print the execution time for the frame processing
-        print(f"Execution time for processing frame: {elapsed_time:.6f} seconds")
+        # # Print the execution time for the frame processing
+        # print(f"Execution time for processing frame: {elapsed_time:.6f} seconds")
 
 # Start time
         # start_time = time.time()
@@ -145,28 +147,30 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
             cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 255), 3)
             cv2.putText(frame, str(int(Id)), (max(-10, x1), max(40, y1)), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
             #计算x1y1 x2y2的矩形框面积，在图像中显示
-            area = (x2-x1)*(y2-y1)
-            cv2.putText(frame, str(int(area)), (max(-10, x1), max(60, y1)), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
+            # area = (x2-x1)*(y2-y1)
+            # cv2.putText(frame, str(int(area)), (max(-10, x1), max(60, y1)), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
             
-        # Update frame count
-        frame_count += 1
+        # # Update frame count
+        # frame_count += 1
     
-        # Calculate FPS every second
-        current_time = time.time()
-        if current_time - start_time >= 1.0:  # Update if a second has passed
-            fps = frame_count
-            frame_count = 0  # Reset frame count
-            start_time = current_time  # Reset start time
+        # # Calculate FPS every second
+        # current_time = time.time()
+        # if current_time - start_time >= 1.0:  # Update if a second has passed
+        #     fps = frame_count
+        #     frame_count = 0  # Reset frame count
+        #     start_time = current_time  # Reset start time
     
-        # Display the FPS on the frame
-        cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
-        # print consuming time
+        # # Display the FPS on the frame
+        # cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
+        # # print consuming time
         
         cv2.imshow("frame", frame)  # Show the current frame.
+        output_video.write(frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' key press.
             break
     
     cap.release()  # Release video file.
+    output_video.release()
     cv2.destroyAllWindows()  # Close all windows.
         
     
@@ -222,10 +226,10 @@ def first():
 if __name__ == "__main__":
     # 指定输入视频的路径。
     ######
-    input_path = "/home/wu/my_ws/src/model-train/img/2.mp4"  ######
-
+    input_path = "/home/wu/Downloads/test.mp4"  ######
+    parent_dir = "/home/wu/Lab/yolov8-deepsort-fast/"
     # 输出文件夹，默认为系统的临时文件夹路径
-    output_path = tempfile.mkdtemp()  # 创建一个临时目录用于存放输出视频。
+    output_path = parent_dir + "output.avi"  # 创建一个临时目录用于存放输出视频。
 
     # 加载yoloV8模型权重
     import openvino as ov
@@ -239,7 +243,7 @@ if __name__ == "__main__":
     res = model(img)
     
     # 加载OpenVINO模型
-    det_model_path = "/home/wu/my_ws/src/yolov8-deepsort-tracking/yolov8n_openvino_model/yolov8n.xml"
+    det_model_path =parent_dir + "yolov8n_openvino_model/yolov8n.xml"
     det_ov_model = core.read_model(det_model_path)
     
     ov_config = {}
@@ -257,6 +261,6 @@ if __name__ == "__main__":
     print(f"detecting {model.names[detect_class]}") # model.names返回模型所支持的所有物体类别
 
     # 加载DeepSort模型
-    tracker = ds.DeepSort("/home/wu/my_ws/src/checkpoint/ckpt.t8")
-
+    tracker = ds.DeepSort(parent_dir + "checkpoint/ckpt.t8")
+    # tracker=None
     detect_and_track(input_path, output_path, detect_class, model, tracker)

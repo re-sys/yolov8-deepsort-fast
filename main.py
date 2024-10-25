@@ -76,15 +76,7 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
     
     fps = cap.get(cv2.CAP_PROP_FPS)  # 获取视频的帧率
     size = (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))) # 获取视频的分辨率（宽度和高度）。
-    # print(f"Input video size: {size}, FPS: {fps}")
-    # output_video_path = Path(output_path) / "output.avi" # 设置输出视频的保存路径。
-
-    # # 设置视频编码格式为XVID格式的avi文件
-    # # 如果需要使用h264编码或者需要保存为其他格式，可能需要下载openh264-1.8.0
-    # # 下载地址：https://github.com/cisco/openh264/releases/tag/v1.8.0
-    # # 下载完成后将dll文件放在当前文件夹内
-    # fourcc = cv2.VideoWriter_fourcc(*"XVID")
-    # output_video = cv2.VideoWriter(output_video_path.as_posix(), fourcc, fps, size, isColor=True) # 创建一个VideoWriter对象用于写视频。
+    
     fourcc = cv2.VideoWriter_fourcc(*"XVID")
     output_video = cv2.VideoWriter(output_path, fourcc, fps, size) 
     # 对每一帧图片进行读取和处理
@@ -98,45 +90,13 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
         success, frame = cap.read()  # Read video frame by frame.
         if not success:
             break
-        # Resize the frame to the same size as the training data，0.5的缩放比例
-        # frame = cv2.resize(frame, (640, 640))
-        # Process the frame with YOLO and DeepSORT
-        # results = model.track(frame, persist=True, classes=[0])
-        # detections, confarray = extract_detections(results, detect_class)
-        # resultsTracker = tracker.update(detections, confarray, frame)
-    # Make sure to import the time module
-        # import time
-        # start_time = time.time()
-
-    # Process the frame with YOLO and DeepSORT
+    
         results = model.predict(frame)
-        # frame = results[0].plot()
+        frame_org = results[0].plot()
         detections, confarray = extract_detections(results, detect_class)
         resultsTracker = tracker.update(detections, confarray, frame)
 
-        # # End time for measuring the overall execution time
-        # end_time = time.time()
-
-        # # Calculate the elapsed time
-        # elapsed_time = end_time - start_time
-
-        # # Print the execution time for the frame processing
-        # print(f"Execution time for processing frame: {elapsed_time:.6f} seconds")
-
-# Start time
-        # start_time = time.time()
-
-        # # Update the tracker and calculate the execution time
-        # resultsTracker = tracker.update(detections, confarray, frame)
-
-        # # End time
-        # end_time = time.time()
-
-        # # Calculate the elapsed time
-        # elapsed_time = end_time - start_time
-
-        # # Print the execution time
-        # print(f"Execution time for tracker.update: {elapsed_time:.6f} seconds")
+   
 
 
 
@@ -145,6 +105,8 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
         for x1, y1, x2, y2, Id in resultsTracker:
             x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])  # Convert position to integers.
             cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 255), 3)
+            # 将置信度显示在矩形框上
+            # cv2.putText(frame, str(round(confarray[Id], 2)), (max(-10, x1), max(40, y1)), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
             cv2.putText(frame, str(int(Id)), (max(-10, x1), max(40, y1)), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
             
         # # Update frame count
@@ -160,7 +122,9 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
         # # Display the FPS on the frame
         cv2.putText(frame, f"FPS: {fps:.2f}", (10, 30), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
         # # print consuming time
-        
+        # combined_frame = np.hstack((frame_org, frame))  # 横向拼接两个帧
+
+        # cv2.imshow("Combined Frame", combined_frame)  # 显示合并后的帧
         cv2.imshow("frame", frame)  # Show the current frame.
         output_video.write(frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' key press.
@@ -181,7 +145,7 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
 if __name__ == "__main__":
     # 指定输入视频的路径。
     ######
-    input_path = "/home/wu/Downloads/test.mp4"  ######
+    input_path = "/home/wu/Lab/yolov8-deepsort-fast/2.mp4"  ######
     parent_dir = "/home/wu/Lab/yolov8-deepsort-fast/"
     # 输出文件夹，默认为系统的临时文件夹路径
     output_path = parent_dir + "output.avi"  # 创建一个临时目录用于存放输出视频。

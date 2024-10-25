@@ -9,3 +9,7 @@
     Speed: 7.5ms preprocess, 53.1ms inference, 1.4ms postprocess per image at shape (1, 3, 640, 640)
     Time taken for tracker.predict: 0.00053 seconds
     Time taken for tracker.update: 0.00177 seconds
+
+3.  已经尝试在cpp上搭建相同的模型，检测模型相比python调用的检测内容更加不准确，有的人物没办法探测到，具体原因不清楚。
+    同时也搭载了自己设置的deepsort的特征提取模型，但是检测效果不够，这个模型也没有办法很好的实施。也已经尝试采用openvino样式也
+    使用特征提取模型，但是没能找到部署方式，有待进一步研究。

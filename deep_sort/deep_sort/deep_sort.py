@@ -12,7 +12,7 @@ __all__ = ['DeepSort'] # __all__ 提供了暴露接口用的”白名单“
 
 
 class DeepSort(object):
-    def __init__(self, model_path, max_dist=0.2, min_confidence=0.3, nms_max_overlap=1.0, max_iou_distance=0.7, max_age=70, n_init=3, nn_budget=100, use_cuda=True):
+    def __init__(self, model_path, max_dist=0.2, min_confidence=0.5, nms_max_overlap=1.0, max_iou_distance=0.7, max_age=70, n_init=3, nn_budget=100, use_cuda=True):
         self.min_confidence = min_confidence # 检测结果置信度阈值 
         self.nms_max_overlap = nms_max_overlap # 非极大抑制阈值，设置为1代表不进行抑制
 
@@ -40,40 +40,11 @@ class DeepSort(object):
         # 筛选掉小于min_confidence的目标，并构造一个Detection对象构成的列表
         detections = [Detection(bbox_tlwh[i], conf, features[i]) for i,conf in enumerate(confidences) if conf>self.min_confidence]
 
-        # run on non-maximum supression
-        # boxes = np.array([d.tlwh for d in detections])
-        # scores = np.array([d.confidence for d in detections])
-        # indices = non_max_suppression(boxes, self.nms_max_overlap, scores)
-        # detections = [detections[i] for i in indices]
-
-        # update tracker
-        # cal the time of following function
+        
 
         self.tracker.predict() # 将跟踪状态分布向前传播一步
         self.tracker.update(detections) # 执行测量更新和跟踪管理
        
-# Existing code...
-
-# # Measure time for self.tracker.predict
-#         start_time = time.time()  # Start the timer for tracker.predict
-#         self.tracker.predict()  # 将跟踪状态分布向前传播一步
-#         predict_time = time.time() - start_time  # Calculate the elapsed time for tracker.predict
-
-#         # Measure time for self.tracker.update
-#         start_time = time.time()  # Start the timer for tracker.update
-#         self.tracker.update(detections)  # 执行测量更新和跟踪管理
-#         update_time = time.time() - start_time  # Calculate the elapsed time for tracker.update
-
-#         # Optionally, print out the time taken for each function call
-#         print(f"Time taken for tracker.predict: {predict_time:.5f} seconds")
-#         print(f"Time taken for tracker.update: {update_time:.5f} seconds")
-
-# Continue with the rest of the processing...
- 
-
-        
-        
-
         # output bbox identities
         outputs = []
         for track in self.tracker.tracks:

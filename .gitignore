@@ -128,4 +128,21 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
+# Ignore image files
+*.jpg
+*.jpeg
+*.png
+*.gif
+*.bmp
+*.tiff
+*.svg
+
+# Ignore video files
+*.mp4
+*.avi
+*.mov
+*.mkv
+*.wmv
+*.flv
+
 openh264-1.8.0-win64.dll

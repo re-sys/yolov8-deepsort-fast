@@ -1,0 +1,18 @@
+names:
+- back_fist
+- close
+- fist
+- good
+- left
+- palm
+- right
+nc: 7
+roboflow:
+  license: CC BY 4.0
+  project: gesture-zgba9
+  url: https://universe.roboflow.com/ws-hgdem/gesture-zgba9/dataset/1
+  version: 1
+  workspace: ws-hgdem
+test: ../test/images
+train: ../train/images
+val: ../valid/images

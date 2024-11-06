@@ -145,7 +145,7 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
 if __name__ == "__main__":
     # 指定输入视频的路径。
     ######
-    input_path = "/home/wu/Lab/yolov8-deepsort-fast/2.mp4"  ######
+    input_path = "/home/wu/Lab/yolov8-deepsort-fast/handdetect/testmp4/zoulang2.mp4"  ######
     parent_dir = "/home/wu/Lab/yolov8-deepsort-fast/"
     # 输出文件夹，默认为系统的临时文件夹路径
     output_path = parent_dir + "output.avi"  # 创建一个临时目录用于存放输出视频。

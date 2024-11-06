@@ -1,10 +1,11 @@
 from ultralytics import YOLO
 import cv2
 # cv2.namedWindow("preview")
-modelname="/home/wu/Lab/yolov8-deepsort-fast/handdetect/best.pt"
+modelname="/home/wu/Lab/yolov8-deepsort-fast/handdetect/metrics/train4/weights/best.pt"
 model = YOLO(modelname)
+# video_path="/home/wu/Lab/yolov8-deepsort-fast/handdetect/testmp4/yangtai.mp4"
 video_path="/home/wu/Lab/yolov8-deepsort-fast/handdetect/4.mp4"
-vc = cv2.VideoCapture(0)
+vc = cv2.VideoCapture(video_path)
 import cv2
 import time
 
@@ -14,6 +15,8 @@ start_time = time.time()
 
 while True:
     rval, frame = vc.read()
+    if not rval:
+        break
     results = model(frame)
     decorated_frame = results[0].plot()
     

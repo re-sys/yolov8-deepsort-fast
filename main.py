@@ -9,30 +9,7 @@ import time
 
 import deep_sort.deep_sort.deep_sort as ds
 
-def putTextWithBackground(img, text, origin, font=cv2.FONT_HERSHEY_SIMPLEX, font_scale=1, text_color=(255, 255, 255), bg_color=(0, 0, 0), thickness=1):
-    """绘制带有背景的文本。
 
-    :param img: 输入图像。
-    :param text: 要绘制的文本。
-    :param origin: 文本的左上角坐标。
-    :param font: 字体类型。
-    :param font_scale: 字体大小。
-    :param text_color: 文本的颜色。
-    :param bg_color: 背景的颜色。
-    :param thickness: 文本的线条厚度。
-    """
-    # 计算文本的尺寸
-    (text_width, text_height), _ = cv2.getTextSize(text, font, font_scale, thickness)
-
-    # 绘制背景矩形
-    bottom_left = origin
-    top_right = (origin[0] + text_width, origin[1] - text_height - 5)  # 减去5以留出一些边距
-    cv2.rectangle(img, bottom_left, top_right, bg_color, -1)
-
-    # 在矩形上绘制文本
-    text_origin = (origin[0], origin[1] - 5)  # 从左上角的位置减去5来留出一些边距
-    cv2.putText(img, text, text_origin, font, font_scale, text_color, thickness, lineType=cv2.LINE_AA)
-    
 def extract_detections(results, detect_class):
     """
     从模型结果中提取和处理检测信息。
@@ -85,7 +62,21 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
     fps = 0  # Initialize a variable for frames per second
     frame_count = 0  # Count the number of frames processed
     start_time = time.time()  # Start time
-    
+            # 假设 center_points 是一个列表，用于存储中心点的坐标
+    tracker_points = {}
+
+    # 假设 max_points 是最大的点数，比如30
+    max_points = 30
+    # 定义颜色映射字典
+    colors = {
+        0: (255, 0, 0),    # 红色
+        1: (0, 255, 0),    # 绿色
+        2: (0, 0, 255),    # 蓝色
+        3: (255, 255, 0),  # 青色
+        4: (255, 0, 255),  # 品红
+        # 可以继续添加更多编号对应的颜色
+    }
+
     while True:
         success, frame = cap.read()  # Read video frame by frame.
         if not success:
@@ -104,10 +95,30 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
  
         for x1, y1, x2, y2, Id in resultsTracker:
             x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])  # Convert position to integers.
-            cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 255), 3)
+
+            center_x = (x1 + x2) // 2
+            center_y = (y1 + y2) // 2
+            if Id not in tracker_points:
+                tracker_points[Id] = []
+            # 只保留最近的30个点
+            tracker_points[Id].append((center_x, center_y))
+
+    # 只保留最近的30个点
+            if len(tracker_points[Id]) > max_points:
+                tracker_points[Id].pop(0)
+
+            # 绘制当前tracker的轨迹
+            for i in range(1, len(tracker_points[Id])):
+                cv2.line(frame, tracker_points[Id][i - 1], tracker_points[Id][i], (0, 255, 0), 2)
+            # cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 255), 3)
+            # 获取对应的颜色，如果Id超出了颜色映射的范围，则使用默认颜色
+            color = colors.get(Id, (255, 255, 255))  # 默认白色
+
+            # 绘制矩形框
+            cv2.rectangle(frame, (x1, y1), (x2, y2), color, 3)
             # 将置信度显示在矩形框上
             # cv2.putText(frame, str(round(confarray[Id], 2)), (max(-10, x1), max(40, y1)), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
-            cv2.putText(frame, str(int(Id)), (max(-10, x1), max(40, y1)), fontScale=1.5, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
+            cv2.putText(frame, "LID-" + str(int(Id)), (max(-10, x1), max(40, y1)), fontScale=1, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=color ,thickness=2)
             
         # # Update frame count
         frame_count += 1
@@ -136,10 +147,6 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
         
     
     return -1
-
-
-   
-
 
 
 if __name__ == "__main__":

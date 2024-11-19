@@ -1,14 +1,33 @@
 from ultralytics import YOLO
 import cv2
+import openvino as ov
+import torch
+import time
+parent_dir = "/home/wu/Lab/yolov8-deepsort-fast/handdetect/"
 # cv2.namedWindow("preview")
 modelname="/home/wu/Lab/yolov8-deepsort-fast/handdetect/metrics/train4/weights/best.pt"
 model = YOLO(modelname)
 # video_path="/home/wu/Lab/yolov8-deepsort-fast/handdetect/testmp4/yangtai.mp4"
 video_path="/home/wu/Lab/yolov8-deepsort-fast/handdetect/4.mp4"
-vc = cv2.VideoCapture(video_path)
-import cv2
-import time
+vc = cv2.VideoCapture(0)
 
+core = ov.Core()
+
+model.to("cpu")
+    # IMAGE_PATH="/home/wu/my_ws/src/yolo_pub/yolo_pub/data/coco_bike.jpg"
+img = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame0.jpg")
+res = model(img)
+det_model_path =parent_dir + "best_openvino_model/best.xml"
+det_ov_model = core.read_model(det_model_path)
+ov_config = {}
+device = "CPU"
+
+compiled_model = core.compile_model(det_ov_model, device, ov_config)
+def infer(*args):
+    result = compiled_model(args)
+    return torch.from_numpy(result[0])
+model.predictor.model.pt = False
+model.predictor.inference = infer
 # Assume 'vc' is your video capture object and 'model' is defined above
 frame_count = 0
 start_time = time.time()
@@ -40,51 +59,3 @@ while True:
 
 cv2.destroyWindow("preview")
 vc.release()
-# import cv2
-# import os
-
-# # 创建保存图像的目录
-# output_dir = 'train2'
-# if not os.path.exists(output_dir):
-#     os.makedirs(output_dir)
-
-# # 打开摄像头
-# vc = cv2.VideoCapture(0)
-
-# # 初始化变量
-# frame_count = 0
-# save_count = 0
-# is_saving = False
-
-# while True:
-#     rval, frame = vc.read()
-#     if not rval:
-#         print("无法读取视频帧，退出...")
-#         break
-
-#     # 更新帧计数
-#     frame_count += 1
-
-#     if is_saving and frame_count % 10 == 0:  # 每十帧保存一张图像
-#         img_name = os.path.join(output_dir, f'frame_{save_count}.jpg')
-#         cv2.imwrite(img_name, frame)
-#         print(f'Saved: {img_name}')
-#         save_count += 1
-
-#     # 显示帧
-#     cv2.imshow("preview", frame)
-
-#     # 处理按键
-#     waitkey = cv2.waitKey(1)
-#     if waitkey == ord('s'):  # 按键 's' 开始保存视频帧
-#         is_saving = True
-#         print("开始保存视频帧...")
-#     elif waitkey == ord('t'):  # 按键 't' 结束保存
-#         is_saving = False
-#         print("结束保存视频帧...")
-#     elif waitkey == 27:  # 按键 ESC 退出
-#         break
-
-# # 清理
-# cv2.destroyWindow("preview")
-# vc.release()

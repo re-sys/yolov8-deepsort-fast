@@ -95,11 +95,12 @@ class Tracker:
 
         # Update distance metric.
         active_targets = [t.track_id for t in self.tracks if t.is_confirmed()]
+        # print("active_targets:", active_targets)
         features, targets = [], []
         for track in self.tracks:
             # 获取所有Confirmed状态的track id
             if not track.is_confirmed():
-                continue
+                continue            
             features += track.features # 将Confirmed状态的track的features添加到features列表
             # 获取每个feature对应的trackid
             targets += [track.track_id for _ in track.features]
@@ -129,7 +130,9 @@ class Tracker:
             i for i, t in enumerate(self.tracks) if t.is_confirmed()]
         unconfirmed_tracks = [
             i for i, t in enumerate(self.tracks) if not t.is_confirmed()]
-
+        # print("confirmed_tracks:", confirmed_tracks)
+        # if self.tracks:
+        #     print(self.tracks[0].track_id)
         # Associate confirmed tracks using appearance features.
         # 对确定态的轨迹进行级联匹配，得到匹配的tracks、不匹配的tracks、不匹配的detections
         # matching_cascade 根据特征将检测框匹配到确认的轨迹。

@@ -174,13 +174,20 @@ class NearestNeighborDistanceMetric(object):
         for feature, target in zip(features, targets):
             # 对应目标下添加新的feature，更新feature集合
             # samples字典    d: feature list}
-            self.samples.setdefault(target, []).append(feature)
+            if target != 1:
+                self.samples.setdefault(target, []).append(feature)
+            else:
+                # print(feature)
+                if feature is not None:
+                    print("add")
+                    self.samples.setdefault(target, []).append(feature)
             if self.budget is not None:
                 # 只考虑budget个目标，超过直接忽略
                 self.samples[target] = self.samples[target][-self.budget:]
         
         # 筛选激活的目标；samples是一个字典{id->feature list}
         self.samples = {k: self.samples[k] for k in active_targets}
+        # print(self.samples)
 
     def distance(self, features, targets):
         """Compute distance between features and targets.

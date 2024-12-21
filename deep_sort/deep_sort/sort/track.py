@@ -150,8 +150,8 @@ class Track:
         self.age += 1
 
         self.time_since_update += 1
-        if self.track_id==1:
-            self.time_since_update = 1
+        if self.track_id==1 and self.time_since_update>3:
+            self.time_since_update = 3
 
     def update(self, kf, detection):
         """Perform Kalman filter measurement update step and update the feature

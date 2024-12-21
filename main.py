@@ -46,28 +46,30 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
     - model: 用于目标检测的模型。
     - tracker: 用于目标跟踪的模型。
     """
-    frame = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame6.jpg")
-    results = model.predict(frame)
-    detections, confarray = extract_detections(results, detect_class)
-    resultsTracker = tracker.update(detections, confarray, frame)
+    # frame = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame6.jpg")
+    # results = model.predict(frame)
+    # detections, confarray = extract_detections(results, detect_class)
+    # resultsTracker = tracker.update(detections, confarray, frame)
     
-    frame = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame6.jpg")
-    results = model.predict(frame)
-    detections, confarray = extract_detections(results, detect_class)
-    resultsTracker = tracker.update(detections, confarray, frame)
+    # frame = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame6.jpg")
+    # results = model.predict(frame)
+    # detections, confarray = extract_detections(results, detect_class)
+    # resultsTracker = tracker.update(detections, confarray, frame)
     
-    frame = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame6.jpg")
-    results = model.predict(frame)
-    detections, confarray = extract_detections(results, detect_class)
-    resultsTracker = tracker.update(detections, confarray, frame)
-    for x1, y1, x2, y2, Id in resultsTracker:
-        x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])  # Convert position to integers.
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 255), 3)
-        cv2.putText(frame, "LID-" + str(int(Id)), (max(-10, x1), max(40, y1)), fontScale=1, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
-    cv2.imshow("frame", frame)
-    cv2.waitKey(0)
+    # frame = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame6.jpg")
+    # results = model.predict(frame)
+    # detections, confarray = extract_detections(results, detect_class)
+    # resultsTracker = tracker.update(detections, confarray, frame)
+    # for x1, y1, x2, y2, Id in resultsTracker:
+    #     x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])  # Convert position to integers.
+    #     cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 255), 3)
+    #     cv2.putText(frame, "LID-" + str(int(Id)), (max(-10, x1), max(40, y1)), fontScale=1, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
+    # cv2.imshow("frame", frame)
+    # cv2.waitKey(0)
     
-    cap = cv2.VideoCapture(input_path)  # 使用OpenCV打开视频文件。
+    
+    #-------------------------------------------------------------------------------------------------
+    cap = cv2.VideoCapture(0)  # 使用OpenCV打开视频文件。
     if not cap.isOpened():  # 检查视频文件是否成功打开。
         print(f"Error opening video file {input_path}")
         return None
@@ -161,24 +163,25 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
         output_video.write(frame)
         if cv2.waitKey(1) & 0xFF == ord('q'):  # Exit loop on 'q' key press.
             break
-    frame = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame6.jpg")
-    results = model.predict(frame)
-    detections, confarray = extract_detections(results, detect_class)
-    resultsTracker = tracker.update(detections, confarray, frame)
-    frame = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame6.jpg")
-    results = model.predict(frame)
-    detections, confarray = extract_detections(results, detect_class)
-    resultsTracker = tracker.update(detections, confarray, frame)
-    frame = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame6.jpg")
-    results = model.predict(frame)
-    detections, confarray = extract_detections(results, detect_class)
-    resultsTracker = tracker.update(detections, confarray, frame)
-    for x1, y1, x2, y2, Id in resultsTracker:
-        x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])  # Convert position to integers.
-        cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 255), 3)
-        cv2.putText(frame, "LID-" + str(int(Id)), (max(-10, x1), max(40, y1)), fontScale=1, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
-    cv2.imshow("frame", frame)
-    cv2.waitKey(0)
+    #---------------------------------------------------------------------
+    # frame = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame6.jpg")
+    # results = model.predict(frame)
+    # detections, confarray = extract_detections(results, detect_class)
+    # resultsTracker = tracker.update(detections, confarray, frame)
+    # frame = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame6.jpg")
+    # results = model.predict(frame)
+    # detections, confarray = extract_detections(results, detect_class)
+    # resultsTracker = tracker.update(detections, confarray, frame)
+    # frame = cv2.imread("/home/wu/Lab/yolov8-deepsort-fast/handdetect/train_img1/5.mp4_frame6.jpg")
+    # results = model.predict(frame)
+    # detections, confarray = extract_detections(results, detect_class)
+    # resultsTracker = tracker.update(detections, confarray, frame)
+    # for x1, y1, x2, y2, Id in resultsTracker:
+    #     x1, y1, x2, y2 = map(int, [x1, y1, x2, y2])  # Convert position to integers.
+    #     cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 255), 3)
+    #     cv2.putText(frame, "LID-" + str(int(Id)), (max(-10, x1), max(40, y1)), fontScale=1, fontFace=cv2.FONT_HERSHEY_SIMPLEX, color=(255, 255, 255), thickness=2)
+    # cv2.imshow("frame", frame)
+    # cv2.waitKey(0)
     cap.release()  # Release video file.
     output_video.release()
     cv2.destroyAllWindows()  # Close all windows.
@@ -202,24 +205,24 @@ if __name__ == "__main__":
     
     core = ov.Core()
     model = YOLO("yolov8n.pt")
-    model.to("cpu")
-    # IMAGE_PATH="/home/wu/my_ws/src/yolo_pub/yolo_pub/data/coco_bike.jpg"
-    img = cv2.imread("demo.png")
-    res = model(img)
+    # model.to("cpu")
+    # # IMAGE_PATH="/home/wu/my_ws/src/yolo_pub/yolo_pub/data/coco_bike.jpg"
+    # img = cv2.imread("demo.png")
+    # res = model(img)
     
-    # 加载OpenVINO模型
-    det_model_path =parent_dir + "yolov8n_openvino_model/yolov8n.xml"
-    det_ov_model = core.read_model(det_model_path)
+    # # 加载OpenVINO模型
+    # det_model_path =parent_dir + "yolov8n_openvino_model/yolov8n.xml"
+    # det_ov_model = core.read_model(det_model_path)
     
-    ov_config = {}
-    device = "CPU"
+    # ov_config = {}
+    # device = "CPU"
     
-    compiled_model = core.compile_model(det_ov_model, device, ov_config)
-    def infer(*args):
-        result = compiled_model(args)
-        return torch.from_numpy(result[0])
-    model.predictor.model.pt = False
-    model.predictor.inference = infer
+    # compiled_model = core.compile_model(det_ov_model, device, ov_config)
+    # def infer(*args):
+    #     result = compiled_model(args)
+    #     return torch.from_numpy(result[0])
+    # model.predictor.model.pt = False
+    # model.predictor.inference = infer
     # 设置需要检测和跟踪的目标类别
     # yoloV8官方模型的第一个类别为'person'
     detect_class = 0

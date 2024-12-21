@@ -179,7 +179,7 @@ class NearestNeighborDistanceMetric(object):
             else:
                 # print(feature)
                 if feature is not None:
-                    print("add")
+                    # print("add")
                     self.samples.setdefault(target, []).append(feature)
             if self.budget is not None:
                 # 只考虑budget个目标，超过直接忽略

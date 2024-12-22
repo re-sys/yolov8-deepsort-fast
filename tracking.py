@@ -56,7 +56,7 @@ class ObjectTrackerNode:
         self.fy = fy
         self.Rot = Rot
         self.model = YOLO(model_path)
-        
+        self.needshow=True
         if use_pipeline:
             # Configure depth and rgb streams
             self.pipeline = rs.pipeline()
@@ -249,10 +249,14 @@ class ObjectTrackerNode:
             # if min_depth_value <= 1 or min_depth_value>=2:
             #     return
         # 绘制最小深度值点
-            # cv2.circle(color_image, (min_depth_x, min_depth_y), 5, (0, 0, 255), -1)
-            # cv2.putText(color_image, f"({x:.2f}, {y:.2f}, {z:.2f})", (min_depth_x + 10, min_depth_y + 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
-            # cv2.putText(color_image, f"Min Depth: {min_depth_value:.2f}m", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+            if self.needshow:
+                cv2.circle(color_image, (min_depth_x, min_depth_y), 5, (0, 0, 255), -1)
+                cv2.putText(color_image, f"({x:.2f}, {y:.2f}, {z:.2f})", (min_depth_x + 10, min_depth_y + 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                cv2.putText(color_image, f"Min Depth: {min_depth_value:.2f}m", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
+                cv2.imshow('color_image', color_image)
+                cv2.waitKey(1)
             # self.color_image = color_image
+            print(f"min_depth_value: {min_depth_value:.2f}m, ({x:.2f}, {y:.2f}, {z:.2f}), {yaw:.2f} yaw")
             if 2>min_depth_value>1.5:
                 
                 pose_msg = PoseStamped()

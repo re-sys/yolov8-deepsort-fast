@@ -25,6 +25,12 @@ class StatePublisher:
         self.bridge = CvBridge()
         self.last_image = None
         self.need_image = True
+        self.need_show = False
+        self.count_fist = 0
+        self.count_left = 0
+        self.count_palm = 0
+        self.count_right = 0
+
         # 创建订阅者
         self.image_sub = rospy.Subscriber("/camera/color/image_raw", Image, self.image_callback)
 
@@ -52,23 +58,61 @@ class StatePublisher:
     def check_condition(self, image):
         # 实现您自己的条件检测逻辑，返回 True 或 False
         results = self.model.predict(image, imgsz=320, half=True)
-        cv2.imshow("image", image)  
-        cv2.waitKey(1)
+        print(self.current_state)
+        if self.need_show:
+            cv2.imshow("image", image)  
+            cv2.waitKey(1)
         for result in results:
             if len(result.boxes.cls.cpu().numpy()) == 0:
                 return False
             for box in result.boxes:
                 class_id = int(box.cls)
                 if class_id == 0:  # 对应 fist
-                    self.current_state = State.TRACKING
+                    self.count_fist += 1
+                    if self.count_fist >= 3:
+                        self.current_state = State.TRACKING
+                        # 重置其他计数器
+                        self.count_left = 0
+                        self.count_palm = 0
+                        self.count_right = 0
                 elif class_id == 1:  # 对应 left
-                    self.current_state = State.LEFT
+                    self.count_left += 1
+                    if self.count_left >= 3:
+                        self.current_state = State.LEFT
+                        # 重置其他计数器
+                        self.count_fist = 0
+                        self.count_palm = 0
+                        self.count_right = 0
                 elif class_id == 2:  # 对应 palm
-                    self.current_state = State.WAITING
+                    self.count_palm += 1
+                    if self.count_palm >= 3:
+                        self.current_state = State.WAITING
+                        # 重置其他计数器
+                        self.count_fist = 0
+                        self.count_left = 0
+                        self.count_right = 0
                 elif class_id == 3:  # 对应 right
-                    self.current_state = State.RIGHT
+                    self.count_right += 1
+                    if self.count_right >= 3:
+                        self.current_state = State.RIGHT
+                        # 重置其他计数器
+                        self.count_fist = 0
+                        self.count_left = 0
+                        self.count_palm = 0
                 print(self.current_state)
-                return True
+                # 只有在状态改变时才返回 True
+                if self.count_fist >= 3 or self.count_left >= 3 or self.count_palm >= 3 or self.count_right >= 3:
+                    return True
+                # if class_id == 0:  # 对应 fist
+                #     self.current_state = State.TRACKING
+                # elif class_id == 1:  # 对应 left
+                #     self.current_state = State.LEFT
+                # elif class_id == 2:  # 对应 palm
+                #     self.current_state = State.WAITING
+                # elif class_id == 3:  # 对应 right
+                #     self.current_state = State.RIGHT
+                # print(self.current_state)
+                # return True
 
 if __name__ == '__main__':
     state_publisher = StatePublisher()

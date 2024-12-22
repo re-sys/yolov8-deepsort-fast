@@ -8,7 +8,7 @@ import time
 # modelname="/home/wu/Lab/yolov8-deepsort-fast/handdetect/metrics/train4/weights/best.pt"
 # modelname="/home/wu/Lab/yolov8-deepsort-fast/handdetect/paperrs.pt"
 # modelname="/home/wu/Lab/yolov8-deepsort-fast/handdetect/metrics/train4/weights/best_int8_openvino_model"
-model = YOLO("gesture_ncnn_model")
+model = YOLO("/home/wu/Lab/yolov8-deepsort-fast/handdetect/gesture_ncnn_model")
 # model.predictor.model.input_shape = (3, 320, 320)
 video_path="/home/wu/Lab/yolov8-deepsort-fast/handdetect/testmp4/yangtai.mp4"
 # video_path="/home/wu/Lab/yolov8-deepsort-fast/handdetect/4.mp4"

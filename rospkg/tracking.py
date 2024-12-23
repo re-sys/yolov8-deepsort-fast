@@ -248,7 +248,7 @@ class ObjectTrackerNode:
         if cx:
             min_depth_value, min_depth_x, min_depth_y = self.get_region(depth_image,cx,cy)
             min_depth_value = min_depth_value/1000
-            x, y, z, yaw, backward_x, backward_y = self.projection(cx, cy, min_depth_value,backward_distance=1.5)
+            x, y, z, yaw, backward_x, backward_y = self.projection(cx, cy, min_depth_value,backward_distance=1)
             # if min_depth_value <= 1 or min_depth_value>=2:
             #     return
         # 绘制最小深度值点
@@ -259,11 +259,11 @@ class ObjectTrackerNode:
                 cv2.imshow('color_image', color_image)
                 cv2.waitKey(1)
             # self.color_image = color_image
-            print(f"({x:.2f}, {y:.2f}, {z:.2f}), {yaw:.2f}")
+            # print(f"({x:.2f}, {y:.2f}, {z:.2f}), {yaw:.2f}")
             pose2d_msg = Pose2D()
-            pose2d_msg.x = x
-            pose2d_msg.y = y
-
+            pose2d_msg.x = backward_x
+            pose2d_msg.y = backward_y
+            rospy.loginfo(f"({backward_x:.2f}, {backward_y:.2f}")
             # 发布Pose2D消息
             self.goalpose_pub.publish(pose2d_msg)
 

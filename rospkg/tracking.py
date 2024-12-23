@@ -8,6 +8,7 @@ from sensor_msgs.msg import Image
 from geometry_msgs.msg import PoseStamped
 from FSM import State
 from cv_bridge import CvBridge, CvBridgeError
+from geometry_msgs.msg import Pose2D
 fx = 897.6827392578125
 fy = 898.0628051757812
 cx = 649.2904052734375
@@ -83,9 +84,11 @@ class ObjectTrackerNode:
             # 创建时间同步器
             self.ts = message_filters.TimeSynchronizer([self.color_sub, self.align_sub], 2)  # 10是缓冲区大小
             self.ts.registerCallback(self.image_callback)
+            
         
         # 创建发布者
-        self.pose_pub = rospy.Publisher('goal_pose', PoseStamped, queue_size=1)
+        # self.pose_pub = rospy.Publisher('goal_pose', PoseStamped, queue_size=1)
+        self.goalpose_pub = rospy.Publisher('goalpose', Pose2D, queue_size=10)
 
         # self.timer = rospy.Timer(rospy.Duration(0.1), self.timer_callback)
         
@@ -256,24 +259,33 @@ class ObjectTrackerNode:
                 cv2.imshow('color_image', color_image)
                 cv2.waitKey(1)
             # self.color_image = color_image
-            print(f"min_depth_value: {min_depth_value:.2f}m, ({x:.2f}, {y:.2f}, {z:.2f}), {yaw:.2f} yaw")
-            if 2>min_depth_value>1.5:
+            print(f"({x:.2f}, {y:.2f}, {z:.2f}), {yaw:.2f}")
+            pose2d_msg = Pose2D()
+            pose2d_msg.x = x
+            pose2d_msg.y = y
+
+            # 发布Pose2D消息
+            self.goalpose_pub.publish(pose2d_msg)
+
+            
+
+            # if 2>min_depth_value>1.5:
                 
-                pose_msg = PoseStamped()
-                pose_msg.header.stamp = rospy.Time.now()
-                pose_msg.header.frame_id = "camera_link"
-                pose_msg.pose.position.x = backward_x
-                pose_msg.pose.position.y = backward_y
-                pose_msg.pose.position.z = z
-                pose_msg.pose.orientation.x = 0
-                pose_msg.pose.orientation.y = 0
-                pose_msg.pose.orientation.z = np.sin(yaw/2)
-                pose_msg.pose.orientation.w = np.cos(yaw/2)
-                self.pose_pub.publish(pose_msg)
-                print(f"({backward_x:.2f}, {backward_y:.2f}, {z:.2f}), {yaw:.2f} yaw")
-            else:
-                print("min_depth_value is too small, return")
-                return
+            #     pose_msg = PoseStamped()
+            #     pose_msg.header.stamp = rospy.Time.now()
+            #     pose_msg.header.frame_id = "camera_link"
+            #     pose_msg.pose.position.x = backward_x
+            #     pose_msg.pose.position.y = backward_y
+            #     pose_msg.pose.position.z = z
+            #     pose_msg.pose.orientation.x = 0
+            #     pose_msg.pose.orientation.y = 0
+            #     pose_msg.pose.orientation.z = np.sin(yaw/2)
+            #     pose_msg.pose.orientation.w = np.cos(yaw/2)
+            #     self.pose_pub.publish(pose_msg)
+            #     print(f"({backward_x:.2f}, {backward_y:.2f}, {z:.2f}), {yaw:.2f} yaw")
+            # else:
+            #     print("min_depth_value is too small, return")
+                # return
        
 
     def _ros_image_to_numpy(self, ros_image):

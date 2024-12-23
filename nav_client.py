@@ -76,9 +76,10 @@ class NavClient:
                 self.ac.send_goal(goal)
                 self.has_new_goal = False  # 重置标志
             else:
-                rospy.loginfo("No new goal received, start rolling to find new goal")
+                rospy.loginfo("start counting")
                 self.count += 1
                 if self.count > 10:
+                    rospy.loginfo("count > 10, sending goal to rotate 360 degrees")
                     self.count = 0
                     goal.target_pose.header.frame_id = "base_link"  # 设置为 map 帧
                     goal.target_pose.header.stamp = rospy.Time.now()

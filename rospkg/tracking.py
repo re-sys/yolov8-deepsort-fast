@@ -214,7 +214,7 @@ class ObjectTrackerNode:
             min_depth_position = np.argmin(non_zero_kernel)
             min_depth_x = center_x - half_kernel + min_depth_position % kernel_size
             min_depth_y = center_y - half_kernel + min_depth_position // kernel_size
-            rospy.loginfo(f"最小深度值: {min_depth_value}, 位置: ({min_depth_x}, {min_depth_y})")
+            # rospy.loginfo(f"最小深度值: {min_depth_value}, 位置: ({min_depth_x}, {min_depth_y})")
             return min_depth_value, min_depth_x, min_depth_y
         else:
             rospy.loginfo("核心区域超出了图像边界")
@@ -260,12 +260,19 @@ class ObjectTrackerNode:
                 cv2.waitKey(1)
             # self.color_image = color_image
             # print(f"({x:.2f}, {y:.2f}, {z:.2f}), {yaw:.2f}")
-            pose2d_msg = Pose2D()
-            pose2d_msg.x = backward_x
-            pose2d_msg.y = backward_y
-            rospy.loginfo(f"({backward_x:.2f}, {backward_y:.2f}")
-            # 发布Pose2D消息
-            self.goalpose_pub.publish(pose2d_msg)
+            if min_depth_value>0.5:
+                pose2d_msg = Pose2D()
+                pose2d_msg.x = backward_x
+                pose2d_msg.y = backward_y
+                rospy.loginfo(f"({backward_x:.2f}, {backward_y:.2f})")
+                # 发布Pose2D消息
+                self.goalpose_pub.publish(pose2d_msg)
+            else:
+                rospy.loginfo(f"min_depth_value is{min_depth_value}, return")
+                return
+                # 发布PoseStamped消息
+                # pose_msg = PoseStamped()
+                # pose_msg.header.stamp = rospy.Time.now()  
 
             
 

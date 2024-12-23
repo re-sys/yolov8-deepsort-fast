@@ -19,13 +19,13 @@ class StatePublisher:
         
         self.current_state = State.WAITING
         rospy.set_param("current_state", self.current_state)
-        # self.model = YOLO("/home/wu/catkin_ws/src/my_pkg/cv_pkg/scripts/gesture_ncnn_model")
-        self.model = YOLO("/home/wu/Lab/yolov8-deepsort-fast/handdetect/gesture_ncnn_model")
+        self.model = YOLO("/home/wu/catkin_ws/src/my_pkg/cv_pkg/scripts/gesture_ncnn_model")
+        # self.model = YOLO("/home/wu/Lab/yolov8-deepsort-fast/handdetect/gesture_ncnn_model")
         # 创建 cv_bridge 实例
         self.bridge = CvBridge()
         self.last_image = None
         self.need_image = True
-        self.need_show = False
+        self.need_show = False 
         self.count_fist = 0
         self.count_left = 0
         self.count_palm = 0
@@ -58,6 +58,7 @@ class StatePublisher:
     def check_condition(self, image):
         # 实现您自己的条件检测逻辑，返回 True 或 False
         results = self.model.predict(image, imgsz=320, half=True)
+        image = results[0].plot()
         print(self.current_state)
         if self.need_show:
             cv2.imshow("image", image)  

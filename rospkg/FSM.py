@@ -57,6 +57,9 @@ class StatePublisher:
 
     def check_condition(self, image):
         # 实现您自己的条件检测逻辑，返回 True 或 False
+        # 增强亮度和对比度
+        
+        
         results = self.model.predict(image, imgsz=320, half=True)
         image = results[0].plot()
         print(self.current_state)

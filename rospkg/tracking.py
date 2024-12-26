@@ -58,6 +58,7 @@ class ObjectTrackerNode:
         self.Rot = Rot
         self.model = YOLO(model_path)
         self.needshow=False
+        self.need_publish=True
         if use_pipeline:
             # Configure depth and rgb streams
             self.pipeline = rs.pipeline()
@@ -123,7 +124,7 @@ class ObjectTrackerNode:
         if cx:
             min_depth_value, min_depth_x, min_depth_y = self.get_region(depth_image,cx,cy)
             min_depth_value = min_depth_value*self.depth_scale
-            x, y, z, yaw, backward_x, backward_y = self.projection(cx, cy, min_depth_value,backward_distance=1.5)
+            x, y, z, yaw, backward_x, backward_y = self.projection(cx, cy, min_depth_value,backward_distance=0.8)
             # if min_depth_value <= 1 or min_depth_value>=2:
             #     return
         # 绘制最小深度值点
@@ -131,7 +132,7 @@ class ObjectTrackerNode:
             cv2.putText(color_image, f"({x:.2f}, {y:.2f}, {z:.2f})", (min_depth_x + 10, min_depth_y + 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
             cv2.putText(color_image, f"Min Depth: {min_depth_value:.2f}m", (10, 30), cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), 2)
             self.color_image = color_image
-            if 2>min_depth_value>1.5:
+            if 2>min_depth_value>0.8:
                 
                 pose_msg = PoseStamped()
                 pose_msg.header.stamp = rospy.Time.now()
@@ -248,7 +249,7 @@ class ObjectTrackerNode:
         if cx:
             min_depth_value, min_depth_x, min_depth_y = self.get_region(depth_image,cx,cy)
             min_depth_value = min_depth_value/1000
-            x, y, z, yaw, backward_x, backward_y = self.projection(cx, cy, min_depth_value,backward_distance=1)
+            x, y, z, yaw, backward_x, backward_y = self.projection(cx, cy, min_depth_value,backward_distance=0.7)
             # if min_depth_value <= 1 or min_depth_value>=2:
             #     return
         # 绘制最小深度值点
@@ -260,13 +261,14 @@ class ObjectTrackerNode:
                 cv2.waitKey(1)
             # self.color_image = color_image
             # print(f"({x:.2f}, {y:.2f}, {z:.2f}), {yaw:.2f}")
-            if min_depth_value>0.5:
+            if 2>min_depth_value>0.5:
                 pose2d_msg = Pose2D()
                 pose2d_msg.x = backward_x
                 pose2d_msg.y = backward_y
                 rospy.loginfo(f"({backward_x:.2f}, {backward_y:.2f})")
                 # 发布Pose2D消息
-                self.goalpose_pub.publish(pose2d_msg)
+                if self.need_publish:
+                    self.goalpose_pub.publish(pose2d_msg)
             else:
                 rospy.loginfo(f"min_depth_value is{min_depth_value}, return")
                 return

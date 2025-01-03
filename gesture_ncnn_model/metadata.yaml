@@ -1,0 +1,17 @@
+description: Ultralytics gesture model trained on /content/datasets/hand-3/data.yaml
+author: Ultralytics
+date: '2024-12-01T18:11:31.658464'
+version: 8.3.31
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 320
+- 320
+names:
+  0: fist
+  1: left
+  2: palm
+  3: right

@@ -69,7 +69,7 @@ def detect_and_track(input_path: str, output_path: str, detect_class: int, model
     
     
     #-------------------------------------------------------------------------------------------------
-    cap = cv2.VideoCapture(0)  # 使用OpenCV打开视频文件。
+    cap = cv2.VideoCapture(input_path)  # 使用OpenCV打开视频文件。
     if not cap.isOpened():  # 检查视频文件是否成功打开。
         print(f"Error opening video file {input_path}")
         return None
@@ -194,7 +194,7 @@ if __name__ == "__main__":
     # 指定输入视频的路径。
     ######
     # input_path = "/home/wu/Lab/yolov8-deepsort-fast/handdetect/testmp4/zoulang2.mp4"  ######
-    input_path = "/home/wu/Desktop/video/xuexiao2.mp4"  ######
+    input_path = "/home/wu/Desktop/video/jia3.mp4"  ######
     parent_dir = "/home/wu/Lab/yolov8-deepsort-fast/"
     # 输出文件夹，默认为系统的临时文件夹路径
     output_path = parent_dir + "output.avi"  # 创建一个临时目录用于存放输出视频。

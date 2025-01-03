@@ -1,84 +1,38 @@
-<div align="center">
-<h1> yolov8-deepsort-tracking </h1>
+添加了使用openvino部署，并且缩小了deep模型中的特征提取
+时间分析：
+1:  640x640 12 persons, 1 bench, 52.9ms
+    Speed: 8.1ms preprocess, 52.9ms inference, 1.4ms postprocess per image at shape (1, 3, 640, 640)
+    Time taken for _get_features: 0.04415 seconds
+    大致上yolo模型耗时52.9ms，特征提取耗时44.15ms，后处理耗时1.4ms，总耗时54.3ms，速度约为98ms/image。
 
-[![Hugging Face Spaces](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-Spaces-blue)](https://huggingface.co/spaces/KdaiP/yolov8-deepsort-tracking)
-</div>
+2.  640x640 16 persons, 3 bicycles, 1 motorcycle, 1 potted plant, 53.1ms
+    Speed: 7.5ms preprocess, 53.1ms inference, 1.4ms postprocess per image at shape (1, 3, 640, 640)
+    Time taken for tracker.predict: 0.00053 seconds
+    Time taken for tracker.update: 0.00177 seconds
 
-![示例图片](./demo.png)
+3.  已经尝试在cpp上搭建相同的模型，检测模型相比python调用的检测内容更加不准确，有的人物没办法探测到，具体原因不清楚。
+    同时也搭载了自己设置的deepsort的特征提取模型，但是检测效果不够，这个模型也没有办法很好的实施。也已经尝试采用openvino样式也
+    使用特征提取模型，但是没能找到部署方式，有待进一步研究。
 
-opencv+yolov8+deepsort的行人检测与跟踪。当然，也可以识别车辆等其他类别。
+4.  在测试视频中，发现有的行人追踪后出现丢失，于是采取多种方案补救。
+    方案一：增大新出现的行人检测阈值，就是使得新tracker的检测阈值更高（3->5），这样可以更好的追踪到过去的未被检测到的行人。
+    实际效果：没有明显的效果，丢失的人物仍然会丢失。
+    方案二：希望匹配的阈值更低（0.5——>0.3），方便重新最终匹配。
+    实际效果：没有明显的效果，丢失的人物仍然会丢失。
+    方案三：增加检测的置信度阈值，使得行人检测更加严格。
+    实际效果：成功解决了丢失的问题，可以追踪到所有行人。
 
-# 更新历史
+5.  中间遇到巨大的安装软件问题，导致无法安装openvino，想办法找资料安装，最终六个小时才完成配置
+    但是安装成功后，在测试视频中，检测效果不如预期，cpp并没有给模型大幅度优化，而且还出现更差的检测精度。
+    于是决定放弃cpp部署，转而使用python部署，完成后续的工作。
 
-2024/3/5：YoloV9模型已添加至WebUI。
-
-2024/2/11更新：清理代码，完善注释。WebUI新增识别目标选择、进度条显示、终止推理、示例等功能。
-
-2023/10/17更新：简化代码，删除不必要的依赖。解决webui上传视频不会清空tracker ID的问题。
-
-2023/7/4更新：加入了一个基于Gradio的WebUI界面
-
-## 安装
-环境：Python>=3.8
-
-本项目需要pytorch，建议手动在[pytorch官网](https://pytorch.org/get-started/locally/)根据自己的平台和CUDA环境安装对应的版本。
-
-pytorch的详细安装教程可以参照[Conda Quickstart Guide for Ultralytics](https://docs.ultralytics.com/guides/conda-quickstart/)
-
-安装完pytorch后，需要通过以下命令来安装其他依赖：
-
-```shell
-$ pip install -r requirements.txt
-```
-
-如果需要使用GUI，需要通过以下命令安装tqdm进度条和Gradio库：
-
-```shell
-$ pip install tqdm gradio
-```
-
-
-## 配置(非WebUI)
-
-在main.py中修改以下代码，将输入视频路径换成你要处理的视频的路径：
-
-```python
-input_path = "test.mp4"
-```
-
-模型默认使用Ultralytics官方的YOLOv8n模型：
-
-```python
-model = YOLO("yolov8n.pt")
-```
-
-其他支持的模型可以参照[ultralytics官方支持的模型列表](https://docs.ultralytics.com/models/)
-例如，如果想要使用YOLOv9模型：
-
-```python
-model = YOLO("yolov9c.pt")
-```
-
-第一次使用时，会自动从官网下载模型。如果网速过慢，可以在[ultralytics的官方文档](https://docs.ultralytics.com/tasks/detect/)下载模型，然后将模型文件拷贝到程序所在目录下。
-
-## 运行(非WebUI)
-
-运行main.py
-
-推理完成后，终端会显示输出视频所在的路径。
-
-## WebUI界面的配置和运行
-
-demo: [Huggingface demo](https://huggingface.co/spaces/KdaiP/yolov8-deepsort-tracking)
-
-
-运行app.py，如果控制台出现以下消息代表成功运行：
-```shell
-Running on local URL:  http://127.0.0.1:6006
-To create a public link, set `share=True` in `launch()`
-```
-
-浏览器打开该URL即可使用WebUI界面
-
-![WebUI](./webui.png)
-
+现在的工作问题：
+1.  小车上没有办法固定好相机并且不会影响到雷达的代价地图生成。
+    尝试解决方案：
+        1. 把相机放在底下，但是这样必须非常远才能看到人的全身，不然只能看到膝盖以下
+        2. 尝试把movebase，或者雷达的有效检测距离调小，从而近距离的干扰不会作为信息点而生成膨胀
+        3. 尝试将人物必须有足够高的confidence才作为目标，还有暂时不用跟踪，因为时延太高，人物的晃动很难追踪到，暂时就一个人追踪即可
+        4. 对于这个人的距离，不应该只使用中心点的深度信息，这样会导致如果中心点在两腿之间，他会认为人在对面墙壁那里
+        5. 现在cv2无法显示图像进行调试，这大大增加了开发的难度。但是在单独得文件中，不适用ros是可以的
+        
+2.

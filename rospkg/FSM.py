@@ -19,7 +19,7 @@ class StatePublisher:
         
         self.current_state = State.WAITING
         rospy.set_param("current_state", self.current_state)
-        self.model = YOLO("/home/wu/catkin_ws/src/my_pkg/cv_pkg/scripts/gesture_ncnn_model")
+        self.model = YOLO("/home/wu/Lab/yolov8-deepsort-fast/gesture_ncnn_model")
         # self.model = YOLO("/home/wu/Lab/yolov8-deepsort-fast/handdetect/gesture_ncnn_model")
         # 创建 cv_bridge 实例
         self.bridge = CvBridge()
